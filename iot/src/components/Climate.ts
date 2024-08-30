@@ -24,24 +24,43 @@ export class Climate extends Device {
     })
 
     twin.on('properties.desired', (desiredChange) => {
-
+      console.log('Received desired properties')
+      console.log(desiredChange)
     })
 
     return twin
   }
 
-  listenForDeviceMethods(): void {
-      this.onDeviceMethod('SET_TEMPERATURE', (request, response) => {
-        const temperature = request.payload.temperature
-        this.setTemperature(temperature)
-        response.send(200, 'Temperature set')
-      })
+  async listenForDeviceMethods(): Promise<void> {
+    const twin = await this.getTwin()
 
-      this.onDeviceMethod('SET_MODE', (request, response) => {
-        const mode = request.payload.mode
-        this.setMode(mode)
-        response.send(200, 'Mode set')
+    this.onDeviceMethod('SET_TEMPERATURE', (request, response) => {
+      console.log('Device method called', 'SET_TEMPERATURE', request.payload)
+
+      const temperature = request.payload.temperature
+      this.setTemperature(temperature)
+
+      twin.properties.reported.update({
+        currentTemperature: this.currentTemperature
+      }, (err: any) => {
+        if (err) throw err
       })
+      response.send(200, 'Temperature set')
+    })
+
+    this.onDeviceMethod('SET_MODE', (request, response) => {
+      console.log('Device method called', 'SET_MODE', request.payload)
+
+      const mode = request.payload.mode
+      this.setMode(mode)
+
+      twin.properties.reported.update({
+        mode: this.mode
+      }, (err: any) => {
+        if (err) throw err
+      })
+      response.send(200, 'Mode set')
+    })
   }
 
   getTemperature() {
