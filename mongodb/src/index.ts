@@ -14,16 +14,14 @@ router.get('/item/:id', async (req, res) => {
   const id = req.params.id
 
   // TODO: Fetch item from MongoDB
-  const item = await db.collection('items')
-    .findOne({ _id: ObjectId.createFromHexString(id) })
+  const item = {}
 
   res.json({ item })
 })
 
 router.get('/item', async (req, res) => {
   // TODO: Fetch items from MongoDB
-  const items = await db.collection('items')
-    .find({}).toArray()
+  const items = {}
 
   res.json({ items })
 })
@@ -42,8 +40,6 @@ router.post('/item/create', async (req, res) => {
   }
 
   // TODO: Insert data to MongoDB
-  await db.collection('items')
-    .insertOne(data)
 
   res.json({ data })
 })
@@ -52,8 +48,6 @@ router.delete('/item/:id', async (req, res) => {
   const id = req.params.id
 
   // TODO: Delete item from MongoDB
-  await db.collection('items')
-    .deleteOne({ _id: ObjectId.createFromHexString(id) })
 
   res.json({ message: 'Item deleted' })
 })
