@@ -18,6 +18,11 @@ IoTRouter.get('/get/climate/:_id', async (req, res) => {
   const device = await db.collection('devices')
     .findOne({ _id })
 
+  if (!device) {
+    res.json({ message: 'Device not found' })
+    return
+  }
+
   const climate = new Climate({
     deviceId: device?.device_id,
     deviceName: device?.device_name,
@@ -26,10 +31,44 @@ IoTRouter.get('/get/climate/:_id', async (req, res) => {
     key: device?.key
   }, false)
 
-  await climate.connect()
-  const twin = await climate.getTwin()
+  try {
+    await climate.connect()
+    const twin = await climate.getTwin()
+    res.json({ device, twin: twin.properties })
+  } catch (error) {
+    res.json({ device, error })
+  }
+})
 
-  res.json({ device, twin: twin.properties })
+IoTRouter.get('/get/climate/dev-id/:id', async (req, res) => {
+  const params = req.params
+  const devId = params.id
+
+  console.log('devId', devId)
+
+  const device = await db.collection('devices')
+    .findOne({ device_id: devId })
+
+  if (!device) {
+    res.json({ message: 'Device not found' })
+    return
+  }
+
+  const climate = new Climate({
+    deviceId: device?.device_id,
+    deviceName: device?.device_name,
+    modelId: device?.model_id,
+    location: device?.location,
+    key: device?.key
+  }, false)
+
+  try {
+    await climate.connect()
+    const twin = await climate.getTwin()
+    res.json({ device, twin: twin.properties })
+  } catch (error) {
+    res.json({ device, error })
+  }
 })
 
 // Web/DB API
