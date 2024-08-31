@@ -28,6 +28,7 @@ export abstract class Device {
   updateInterval: number = 5000
   isConsumingEnergy: boolean = false
   isSimulated: boolean = true
+  #key: string
 
   constructor(options: DeviceOptions, simulated: boolean = true) {
     this.deviceId = options.deviceId
@@ -36,10 +37,11 @@ export abstract class Device {
     this.location = options.location
     this.eneryConsumption = options.energyConsumption || 0
     this.isSimulated = simulated
+    this.#key = options.key
   }
 
   private getConnectionString() {
-    return `HostName=${IOT_HUB_HOST};DeviceId=${this.deviceId};SharedAccessKey=${IOT_HUB_SAS_KEY}`
+    return `HostName=${IOT_HUB_HOST};DeviceId=${this.deviceId};SharedAccessKey=${this.#key}`
   }
 
   private createClient(): Client {
